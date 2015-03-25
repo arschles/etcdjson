@@ -21,6 +21,10 @@
 			"ImportPath": "github.com/coreos/go-etcd/etcd",
 			"Comment": "v0.4.6-8-g60e12ca",
 			"Rev": "60e12cac3db8ffce00b576b4af0e7b0a968f1003"
+		},
+		{
+			"ImportPath": "github.com/yasuyuky/jsonpath",
+			"Rev": "eddfea409b59ec4786f33f77b90287de3f6bd632"
 		}
 	]
 }
