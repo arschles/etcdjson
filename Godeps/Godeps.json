@@ -1,0 +1,26 @@
+{
+	"ImportPath": "github.com/arschles/etcdjson",
+	"GoVersion": "go1.4.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-93-g2bcd11f",
+			"Rev": "2bcd11f863d540a1b190dc03b6c4f634c6ae91d4"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/etcdserver/etcdhttp/httptypes",
+			"Comment": "v2.0.4-298-gbbcee5f",
+			"Rev": "bbcee5f506addd5f5f8926599459e64ab7ececa8"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/types",
+			"Comment": "v2.0.4-298-gbbcee5f",
+			"Rev": "bbcee5f506addd5f5f8926599459e64ab7ececa8"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-etcd/etcd",
+			"Comment": "v0.4.6-8-g60e12ca",
+			"Rev": "60e12cac3db8ffce00b576b4af0e7b0a968f1003"
+		}
+	]
+}
