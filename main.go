@@ -16,18 +16,20 @@ func main() {
 			Value: &cli.StringSlice{},
 			Usage: "set the target Etcd server(s)",
 		},
-		cli.IntFlag{
-			Name:  "ttl, t",
-			Value: 0,
-			Usage: "set the ttl",
-		},
 	}
 	app.Commands = []cli.Command{
 		cli.Command{
 			Name:    "set",
 			Aliases: []string{"s"},
-			Usage:   "set a JSON value",
-			Action:  set,
+			Flags: []cli.Flag{
+				cli.IntFlag{
+					Name:  "ttl",
+					Value: 1000,
+					Usage: "the TTL of the key to set",
+				},
+			},
+			Usage:  "set a JSON value",
+			Action: set,
 		},
 		cli.Command{
 			Name:    "get",

@@ -46,7 +46,7 @@ func get(c *cli.Context) {
 
 	res, err := jsonpath.Get(data, pathSlice, nil)
 	if err != nil {
-		exitln(err)
+		exitln("path not found")
 	}
 	if res == nil {
 		exitf("no value at %+v", pathSlice)
