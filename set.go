@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/arschles/etcdjson/Godeps/_workspace/src/github.com/codegangsta/cli"
@@ -19,9 +18,9 @@ type setCmd struct {
 func newSetCmd(c *cli.Context) (*setCmd, error) {
 	args := c.Args()
 	if len(args) < 3 {
-		return nil, fmt.Errorf("format is set KEY VAL PATH")
+		return nil, fmt.Errorf("format is set KEY PATH VAL")
 	}
-	return &setCmd{key: args[0], val: args[1], path: args[2]}, nil
+	return &setCmd{key: args[0], val: args[2], path: args[1]}, nil
 }
 
 func set(c *cli.Context) {
@@ -44,24 +43,12 @@ func set(c *cli.Context) {
 	}
 
 	split := strings.Split(cmd.path, ".")
-	eltPtr, err := getPtr(m, split)
+	newMap, err := setInMap(m, split, cmd.val)
 	if err != nil {
 		exitln(err)
 	}
-	switch t := eltPtr.(type) {
-	case *string:
-		*t = cmd.val
-	case *int:
-		i, err := strconv.Atoi(cmd.val)
-		if err != nil {
-			exitf("int found at that path and couldn't convert %s", cmd.val)
-		}
-		*t = i
-	default:
-		exitf("unsupported json at the given path [%+v] (%T)", t, t)
-	}
 
-	b, err := json.Marshal(m)
+	b, err := json.Marshal(newMap)
 	if err != nil {
 		exitln(err)
 	}

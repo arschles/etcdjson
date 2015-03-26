@@ -1,69 +1,64 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 func noKeyErr(key string) error {
 	return fmt.Errorf("no key %s found", key)
 }
 
-func keyExistsIface(m map[string]interface{}, key string) bool {
-	_, ok := m[key]
+func keyExistsIface(m *map[string]interface{}, key string) bool {
+	_, ok := (*m)[key]
 	return ok
 }
-func keyExistsInt(m map[string]int, key string) bool {
-	_, ok := m[key]
+func keyExistsInt(m *map[string]int, key string) bool {
+	_, ok := (*m)[key]
 	return ok
 }
-func keyExistsStr(m map[string]string, key string) bool {
-	_, ok := m[key]
+func keyExistsStr(m *map[string]string, key string) bool {
+	_, ok := (*m)[key]
 	return ok
 }
 
 // getPtr gets a pointer to the value in the map m at the given path.
 // if the path doesn't exist in m, returns nil and an error indicating so.
-func getPtr(m interface{}, path []string) (interface{}, error) {
-	fmt.Printf("getPtr m = %+v (%T)\n", m, m)
-	fmt.Printf("getPtr path = %+v\n", path)
-
+// if no error, getPtr will return a pointer to the value at path.
+// you can follow the pointer and set it to the value you want. you
+// should type check it first
+func setInMap(m interface{}, path []string, newVal interface{}) (interface{}, error) {
 	// terminal types
 	if len(path) == 0 {
-		fmt.Printf("terminal type %+v (%T)", m, m)
-		switch t := m.(type) {
-		case string:
-			return &t, nil
-		case float64:
-			return &t, nil
-		case bool:
-			return &t, nil
-		case map[string]interface{}:
-			return &t, nil
-		default:
-			return nil, fmt.Errorf("unknown terminal type %+v (%T)", t, t)
-		}
+		return newVal, nil
 	}
 
-	// intermediate types
-	switch t := m.(type) {
-	case map[string]interface{}:
-		fmt.Println("got map[string]interface{}")
-		if keyExistsIface(t, path[0]) {
-			return getPtr(t[path[0]], path[1:])
+	key := path[0]
+	termErr := fmt.Errorf("path terminates early at %s", key)
+	rem := path[1:]
+
+	val := reflect.ValueOf(m)
+	switch val.Kind() {
+	case reflect.Map:
+		keys := val.MapKeys()
+		found := false
+		for _, k := range keys {
+			if reflect.DeepEqual(k.Interface(), key) {
+				found = true
+				break
+			}
 		}
-		return nil, noKeyErr(path[0])
-	case map[string]int:
-		fmt.Println("got map[string]int")
-		if keyExistsInt(t, path[0]) {
-			return getPtr(t[path[0]], path[1:])
+		if !found {
+			return nil, termErr
 		}
-		return nil, noKeyErr(path[0])
-	case map[string]string:
-		fmt.Println("got map[string]string")
-		if keyExistsStr(t, path[0]) {
-			return getPtr(t[path[0]], path[1:])
+		subMap := val.MapIndex(reflect.ValueOf(key))
+		newSubMap, err := setInMap(subMap.Interface(), rem, newVal)
+		if err != nil {
+			return nil, err
 		}
-		return nil, noKeyErr(path[0])
+		val.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(newSubMap))
+		return val.Interface(), nil
 	default:
-		fmt.Println("got nothing")
-		return nil, fmt.Errorf("path %+v doesn't exist", path)
+		return nil, fmt.Errorf("value at path %s is unsupported type %T", key, m)
 	}
 }
